@@ -17,7 +17,7 @@
 // DADOS DO FIREBASE
 // =====================================
 
-#define API_KEY "oML3IJFnzySRkWHzRIBXQzt9MXf2"
+#define API_KEY "AIzaSyCWtKMLZDq6-nuEL-2xoXJcQc2OeUIN52w"
 
 #define USER_EMAIL "vs3661552@gmail.com"
 #define USER_PASSWORD "Gard1234@"
@@ -30,6 +30,37 @@
 
 #define RELE1 25
 #define RELE2 33
+
+// Muitos modulos de rele sao ativados com nivel BAIXO.
+// Se a lampada acender invertida, troque para true/false.
+#define RELE_ATIVO_EM_NIVEL_BAIXO false
+
+const int PINOS_RELE[2] = {RELE1, RELE2};
+
+void acionarRele(int indice, bool ligado) {
+
+    bool nivel = RELE_ATIVO_EM_NIVEL_BAIXO ? !ligado : ligado;
+
+    digitalWrite(PINOS_RELE[indice], nivel ? HIGH : LOW);
+
+    Serial.print("LAMPADA ");
+    Serial.print(indice + 1);
+    Serial.println(ligado ? " LIGADA!" : " DESLIGADA!");
+}
+
+// Procura "lampadaN":true/false em um JSON simples.
+// Retorna 1 (true), 0 (false) ou -1 (nao encontrado).
+int lerEstadoJson(const String &json, int numero) {
+
+    String chave = "\"lampada" + String(numero) + "\":";
+    int pos = json.indexOf(chave);
+
+    if (pos < 0) return -1;
+
+    pos += chave.length();
+
+    return json.startsWith("true", pos) ? 1 : 0;
+}
 
 // =====================================
 // FIREBASE
@@ -75,20 +106,29 @@ void processarDados(AsyncResult &resultado) {
 
         if (stream.isStream()) {
 
-            bool estado = stream.to<bool>();
+            // O stream escuta o no "/lampadas". Dois tipos de evento:
+            //  - caminho "/"          -> JSON com todas as lampadas (evento inicial)
+            //  - caminho "/lampadaN"  -> valor booleano de uma lampada
+            String caminho = stream.dataPath();
 
-            if (estado == true) {
+            if (caminho == "/") {
 
-                digitalWrite(RELE1, LOW);
+                String json = stream.to<String>();
 
-                Serial.println("LAMPADA LIGADA!");
+                for (int i = 0; i < 2; i++) {
 
-            } else {
+                    int estado = lerEstadoJson(json, i + 1);
 
-                digitalWrite(RELE2, HIGH);
+                    if (estado >= 0) acionarRele(i, estado == 1);
+                }
 
-                Serial.println("LAMPADA DESLIGADA!");
+            } else if (caminho == "/lampada1") {
 
+                acionarRele(0, stream.to<bool>());
+
+            } else if (caminho == "/lampada2") {
+
+                acionarRele(1, stream.to<bool>());
             }
         }
     }
@@ -105,9 +145,9 @@ void setup() {
     pinMode(RELE1, OUTPUT);
     pinMode(RELE2, OUTPUT);
 
-    // Mantem o rele desligado inicialmente
-    digitalWrite(RELE1, LOW);
-    digitalWrite(RELE2, LOW);
+    // Mantem os reles desligados inicialmente
+    acionarRele(0, false);
+    acionarRele(1, false);
 
     Serial.println();
     Serial.println("================================");
@@ -155,14 +195,14 @@ void setup() {
 
     Serial.println("Firebase configurado!");
 
-    // Escutar alteracoes da lampada
+    // Escutar alteracoes das lampadas (/lampadas/lampada1 e /lampadas/lampada2)
 
     Database.get(
         cliente,
-        "/lampada/estado",
+        "/lampadas",
         processarDados,
         true,
-        "monitorLampada"
+        "monitorLampadas"
     );
 
     Serial.println("Aguardando comandos do site...");

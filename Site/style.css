@@ -141,14 +141,20 @@ button:disabled {
 ====================================== */
 
 .lampada {
-    font-size: 75px;
+    font-size: 60px;
     margin-bottom: 15px;
     opacity: 0.4;
 }
 
-#status {
+.status {
     color: #64748b;
     margin-bottom: 25px;
+}
+
+.lampadaItem {
+    padding-bottom: 25px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 

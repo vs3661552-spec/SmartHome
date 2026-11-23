@@ -1,5 +1,5 @@
 // ======================================
-// SMARTHOME - CONTROLE DA LÂMPADA
+// SMARTHOME - CONTROLE DE 2 LÂMPADAS
 // ======================================
 
 // Importações do Firebase
@@ -31,50 +31,46 @@ const emailInput = document.getElementById("email");
 const senhaInput = document.getElementById("senha");
 
 const botaoLogin = document.getElementById("botaoLogin");
-const botaoLampada = document.getElementById("botaoLampada");
 const botaoSair = document.getElementById("botaoSair");
-
 const mensagemLogin = document.getElementById("mensagemLogin");
 
-const status = document.getElementById("status");
-const icone = document.getElementById("iconeLampada");
-
-
 // ======================================
-// REFERÊNCIA DA LÂMPADA NO FIREBASE
+// LÂMPADAS (cada uma é um nó em /lampadas/<id>)
 // ======================================
 
-const lampadaRef = ref(database, "lampada/estado");
+const lampadas = [...document.querySelectorAll(".lampadaItem")].map((el) => {
 
-let lampadaLigada = false;
-let pararMonitoramento = null;
+    const id = el.dataset.lampada;   // "lampada1", "lampada2"
+    const numero = id.replace("lampada", "");
+
+    return {
+        id,
+        numero,
+        ref: ref(database, `lampadas/${id}`),
+        ligada: false,
+        parar: null,
+        status: el.querySelector(".status"),
+        icone: el.querySelector(".lampada"),
+        botao: el.querySelector(".botaoLampada")
+    };
+});
 
 
 // ======================================
 // ATUALIZAR A INTERFACE
 // ======================================
 
-function atualizarInterface(estado) {
+function atualizarInterface(lampada, estado) {
 
-    lampadaLigada = estado;
+    lampada.ligada = estado;
 
-    if (estado) {
+    lampada.status.textContent =
+        `Lâmpada ${lampada.numero} ${estado ? "ligada" : "desligada"}`;
 
-        status.textContent = "Lâmpada ligada";
+    lampada.botao.textContent =
+        `${estado ? "DESLIGAR" : "LIGAR"} LÂMPADA ${lampada.numero}`;
 
-        botaoLampada.textContent = "DESLIGAR LÂMPADA";
-
-        icone.style.opacity = "1";
-
-    } else {
-
-        status.textContent = "Lâmpada desligada";
-
-        botaoLampada.textContent = "LIGAR LÂMPADA";
-
-        icone.style.opacity = "0.4";
-
-    }
+    lampada.icone.style.opacity = estado ? "1" : "0.4";
 }
 
 
@@ -124,55 +120,58 @@ formLogin.addEventListener("submit", async (evento) => {
 // VERIFICAR AUTENTICAÇÃO
 // ======================================
 
+function pararMonitoramentos() {
+
+    lampadas.forEach((lampada) => {
+
+        if (lampada.parar) {
+
+            lampada.parar();
+
+            lampada.parar = null;
+        }
+    });
+}
+
 onAuthStateChanged(auth, (usuario) => {
+
+    // Evita criar vários monitoramentos
+    pararMonitoramentos();
 
     if (usuario) {
 
-        // Usuário conectado
         telaLogin.hidden = true;
 
         telaControle.hidden = false;
 
-        status.textContent = "Conectando ao Firebase...";
+        lampadas.forEach((lampada) => {
 
-        // Evita criar vários monitoramentos
-        if (pararMonitoramento) {
-            pararMonitoramento();
-        }
+            lampada.status.textContent = "Conectando ao Firebase...";
 
-        pararMonitoramento = onValue(
-            lampadaRef,
+            lampada.parar = onValue(
+                lampada.ref,
 
-            (snapshot) => {
+                (snapshot) => {
 
-                atualizarInterface(snapshot.val() === true);
+                    atualizarInterface(lampada, snapshot.val() === true);
 
-            },
+                },
 
-            (erro) => {
+                (erro) => {
 
-                console.error("Erro ao consultar lâmpada:", erro);
+                    console.error(`Erro ao consultar ${lampada.id}:`, erro);
 
-                status.textContent = "Erro na conexão com Firebase";
+                    lampada.status.textContent = "Erro na conexão com Firebase";
 
-            }
-        );
+                }
+            );
+        });
 
     } else {
 
-        // Usuário desconectado
         telaLogin.hidden = false;
 
         telaControle.hidden = true;
-
-        if (pararMonitoramento) {
-
-            pararMonitoramento();
-
-            pararMonitoramento = null;
-
-        }
-
     }
 
 });
@@ -182,30 +181,33 @@ onAuthStateChanged(auth, (usuario) => {
 // BOTÃO DE CONTROLE DA LÂMPADA
 // ======================================
 
-botaoLampada.addEventListener("click", async () => {
+lampadas.forEach((lampada) => {
 
-    const novoEstado = !lampadaLigada;
+    lampada.botao.addEventListener("click", async () => {
 
-    try {
+        const novoEstado = !lampada.ligada;
 
-        botaoLampada.disabled = true;
+        try {
 
-        await set(lampadaRef, novoEstado);
+            lampada.botao.disabled = true;
 
-        console.log("Comando enviado ao Firebase:", novoEstado);
+            await set(lampada.ref, novoEstado);
 
-    } catch (erro) {
+            console.log(`Comando enviado (${lampada.id}):`, novoEstado);
 
-        console.error("Erro ao enviar comando:", erro);
+        } catch (erro) {
 
-        alert("Não foi possível controlar a lâmpada.");
+            console.error("Erro ao enviar comando:", erro);
 
-    } finally {
+            alert(`Não foi possível controlar a lâmpada ${lampada.numero}.`);
 
-        botaoLampada.disabled = false;
+        } finally {
 
-    }
+            lampada.botao.disabled = false;
 
+        }
+
+    });
 });
 
 
