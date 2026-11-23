@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SmartHome - Controle de Iluminação</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="container">
+
+        <h1>SmartHome</h1>
+
+        <p class="subtitle">Controle inteligente de iluminação</p>
+
+        <!-- TELA DE LOGIN -->
+        <section class="card" id="telaLogin">
+
+            <h2>Acesse sua conta</h2>
+
+            <p class="descricao">
+                Entre para controlar sua iluminação.
+            </p>
+
+            <form id="formLogin">
+
+                <label for="email">E-mail</label>
+
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Digite seu e-mail"
+                    required
+                >
+
+                <label for="senha">Senha</label>
+
+                <input
+                    type="password"
+                    id="senha"
+                    placeholder="Digite sua senha"
+                    required
+                >
+
+                <button type="submit" id="botaoLogin">
+                    ENTRAR
+                </button>
+
+            </form>
+
+            <p id="mensagemLogin"></p>
+
+        </section>
+
+
+        <!-- TELA DE CONTROLE DA LÂMPADA -->
+        <section class="card" id="telaControle" hidden>
+
+            <div class="lampada" id="iconeLampada">💡</div>
+
+            <h2>Minha lâmpada</h2>
+
+            <p id="status">Lâmpada desligada</p>
+
+            <button id="botaoLampada">
+                LIGAR LÂMPADA
+            </button>
+
+            <button id="botaoSair" class="botaoSair">
+                SAIR DA CONTA
+            </button>
+
+        </section>
+
+        <p class="conexao">
+            Sistema de controle residencial
+        </p>
+
+    </main>
+
+    <script type="module" src="script.js"></script>
+
+</body>
+</html>

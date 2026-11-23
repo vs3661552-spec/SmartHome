@@ -1,0 +1,177 @@
+/* ======================================
+   CONFIGURAÇÕES GERAIS
+====================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #f1f5f9;
+    min-height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* ======================================
+   CONTAINER
+====================================== */
+
+.container {
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+}
+
+h1 {
+    color: #079c91;
+    font-size: 32px;
+}
+
+.subtitle {
+    color: #64748b;
+    margin: 10px 0 30px;
+}
+
+
+/* ======================================
+   CARD
+====================================== */
+
+.card {
+    background: white;
+    padding: 35px 25px;
+    border-radius: 18px;
+
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+h2 {
+    color: #202d36;
+    margin-bottom: 15px;
+}
+
+.descricao {
+    color: #64748b;
+    margin-bottom: 25px;
+}
+
+
+/* ======================================
+   CAMPOS DE LOGIN
+====================================== */
+
+form {
+    text-align: left;
+}
+
+label {
+    display: block;
+    color: #202d36;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 20px;
+
+    border: 1px solid #dce3e8;
+    border-radius: 9px;
+
+    font-size: 14px;
+    outline: none;
+}
+
+input:focus {
+    border-color: #079c91;
+}
+
+
+/* ======================================
+   BOTÕES
+====================================== */
+
+button {
+    background: #079c91;
+    color: white;
+
+    border: none;
+    padding: 15px 25px;
+
+    border-radius: 10px;
+
+    font-size: 15px;
+    font-weight: bold;
+
+    cursor: pointer;
+    width: 100%;
+}
+
+button:hover {
+    background: #067d75;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+/* ======================================
+   MENSAGEM DE LOGIN
+====================================== */
+
+#mensagemLogin {
+    color: #079c91;
+    margin-top: 18px;
+    font-size: 14px;
+}
+
+
+/* ======================================
+   LÂMPADA
+====================================== */
+
+.lampada {
+    font-size: 75px;
+    margin-bottom: 15px;
+    opacity: 0.4;
+}
+
+#status {
+    color: #64748b;
+    margin-bottom: 25px;
+}
+
+
+/* ======================================
+   BOTÃO SAIR
+====================================== */
+
+.botaoSair {
+    margin-top: 15px;
+    background: #64748b;
+}
+
+.botaoSair:hover {
+    background: #475569;
+}
+
+
+/* ======================================
+   RODAPÉ
+====================================== */
+
+.conexao {
+    margin-top: 25px;
+    color: #94a3b8;
+    font-size: 13px;
+}
